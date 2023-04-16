@@ -1,0 +1,26 @@
+import cv2 as cv
+import numpy as np
+
+people = ['Ben Afflek', 'Elton John', 'Jerry Seinfield', 'Madonna', 'Mindy Kaling']
+
+img = cv.imread(r"C:\Users\PRAKRITI CHATTERJEE\OneDrive\opencv\Faces\val\madonna\3.jpg")
+
+gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+face_recognizer = cv.face.LBPHFaceRecognizer_create()
+face_recognizer.read("face_trained.yml")
+
+face_cascade = cv.CascadeClassifier(cv.data.haarcascades + 'haarcascade_frontalface_default.xml')
+face_rect = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=6)
+
+for (x,y,w,h) in face_rect:
+    faces_roi = gray[y:y+h, x:x+w]
+
+    label, confidence = face_recognizer.predict(faces_roi)
+    cv.rectangle(img, (x,y), (x+w,y+h), (0,255,0), thickness=2)
+    cv.putText(img, str(people[label]), (20,20), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
+    print(f"person {people[label]} has been identified with accuracy of {confidence}")
+    
+cv.imshow('Person',img)
+
+cv.waitKey(0)
